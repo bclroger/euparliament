@@ -1,0 +1,17 @@
+Package: euparliament
+Type: Package
+Title: Analysis of the EU Parliament elections of 2014 and 2019
+Version: 1.0.0
+Author: Bruno Carvalho Lopes Rogério
+Maintainer: Bruno Carvalho Lopes Rogério <bclroger@hotmail.com>
+Description: This package provides a database with the EU Parliament election results of 2014 and 2019 as well as functions to analyze it. 
+    The functions itself are designed to allow the user to transform the original database and reagroup the different political parties into larger political groups and
+    also allow to produce maps of the EU displaying the election results.
+    The package also includes a vignette with an already made analysis of the election results of 2014 and 2019.
+License: Free use
+Encoding: UTF-8
+LazyData: true
+Imports: ggplot2
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+URL: https://github.com/bclroger/euparliament

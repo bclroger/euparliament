@@ -1,0 +1,481 @@
+---
+title: "Spatial Data Science with R - Final Project - European Union Parliament Data Analysis"
+author: "Bruno Carvalho Lopes Rogério - Masters in Geospatial Technologies - 500 412"
+date: "1/15/2020"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{EU Parliament Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+libs = c("ggplot2", "rnaturalearth", "rnaturalearthdata")
+for (i in libs){
+  if( !is.element(i, .packages(all.available = TRUE)) ) {
+    install.packages(i)
+  }
+  library(i,character.only = TRUE)
+}
+
+library("euparliament")
+
+```
+
+## Introduction
+
+
+In the years of 2014 and 2019 the European Union has held European Parliament elections, whose results have shown a strong change in the balance of power within the EU. While the more established political parties have lost power within the European Parliament, Eurosceptic parties have gained momentum in the 2019 election. 
+
+In this project an analysis of the election results of 2014 and 2019 will be carried out to better understand and visualize this shift in power. This will be done by regrouping the European parties into larger political groups in order to better understand the over-arching changes. Then the results will be re-examined and maps of the European Union displaying the number of seats held by each larger political groups will be produced, along with maps that shows the changes in seats held by each political group from the 2014 election to the 2019. By doing this, it not only will be easier to better visualize the election results themselves but will also allow to trace in which countries most changes have taken place and where each political group has a greater hold on power.
+
+Throughout this project, 7 different functions have been created especially for it. The first four are used the rearrange the dataset (which in itself was collected from an article from the BBC) into the desired format and regroup the 10 parties within the EU Parliament into 4 political groups. The remaining 3 functions are used the quickly and easily plot the results into intuitive maps displaying the election results for the reader to better understand and visualize what has happened in the 2014 and 2019 EU Parliament elections.
+
+
+
+## Political Groups Within the European Parliament
+
+In the 2019 European Parliament elections, European citizens voted thoughout the continent in candidates from their own countries to represent them in the European Parliament. Although each candidate usually belongs to a national party, each party associates itself with a greater European political group that unites several parties from different countries with similar objectives within the European Parliament. Even though those groups are the result of political alliances that are open to changes, at the time of the election results in 2019, there were eight main political groups elected within the European Parliament. And below there is a short description of each political group.
+
+**EPP (European People’s Party)**
+
+The Group of the European People’s Party (EPP) is the oldest and largest political group within the European Parliament, currently holding 178 of all 751 available seats. This group holds center right views and policies and has the stated goals is the creation of a more competitive and democratic European Union, providing its citizens the necessary freedoms to live according to their desires while providing safety nets for those who are worse off.
+
+Source: https://www.eppgroup.eu/about-us
+
+
+**S&D (Socialists and Democrats)**
+
+The political group Socialists and Democrats (S&D) of the European Parliament is the second largest political group within the EU currently holding 149 seats. Both the S&D and the EPP have historically the main political groups within the European Parliament. S&D is a center left political group that states its goals as the creation of inclusive European society based on the five principles of: solidarity, diversity, fairness, freedom and equality.
+
+Source: https://www.socialistsanddemocrats.eu/who-we-are
+
+
+**ALDE (Alliance of Liberals and Democrats for Europe)**
+
+The Alliance of Liberals and Democrats for Europe (or ALDE), as the name suggests, is a group of liberal-leaning parties. As a pro-European Union group, ALDE believes in what it calls the four freedoms of the EU: freedom of movement of people, goods, services and capital. Its stated beliefs are freedom, tolerance, solidarity, human rights democracy and the rule of law.
+
+Source: https://www.aldeparty.eu/about/the-alde-party
+
+
+**EFA (Greens)**
+
+The Greens, also known as the European Free Alliance (EFA), are a political group that has as its priorities environmental and sustainable policies, while also concerning itself with issues to end racism, xenophobia and also fights for representation of “stateless nations within the European Union such as Scotland and Catalonia. 
+
+Source: https://efa.greens-efa.eu/en/our-group/presentation/
+
+
+**ECR (European Conservatives and Reformists)**
+
+The ECR is a conservative political group within the European Parliament better known for their anti-European Union position, which they call “Eurorealist”. This particular group states that there are indeed areas of cooperation for all member-States within the European Union, but aims for a more narrow and restricted role for the European Union. Its state beliefs are guiding the EU to a new direction, using common sense and creating an alternative agenda for the EU.
+
+Source: https://ecrgroup.eu/about
+
+
+**ENF (Europe of Nations and Freedom)**
+
+The ENF is a new political group within the EU parliament created in 2015 and as a result, had no seats in parliament in the 2014 European elections, which is represented in the data in this report. Although new, this group has currently been replaced by another political group with similar positions called the Identity and Democracy group. This analysis will use the ENF instead of the ID group, as it better reflects the results of the European election of 2019 at the time it took place. The ENF (and the ID group, for that matter), is notorious for its anti-European and nationalist views.
+
+Source: https://en.wikipedia.org/wiki/Europe_of_Nations_and_Freedom
+
+
+**EFD (Europe of Freedom and Democracy)**
+
+Much like the ENF, the EFD is yet another Euroskeptic political group within the European parliament. This group also has strong nationalistic views and has seen gains in the number of parliament seats it holds between the 2014 and 2019 elections.
+
+Source: https://en.wikipedia.org/wiki/Europe_of_Freedom_and_Democracy
+
+
+**GUE/NGL (European United Left/Nordic Green Left)**
+
+This political group within the European Parliament is the result of the alliance between the Group of the European United Left and the Nordic Green Left. Throughout this report, for the sake of simplicity, this group will only be referenced as “GUE”. This left-leaning political group states as its main objective is to make sure that the EU is not a project for the elites and they fight for equal rights, civil and human rights. They also have an anti-fascism and anti-racism agenda.
+
+Source: https://www.guengl.eu/about-the-group/
+
+
+**Others and Independents**
+
+There are other seats within the European Parliament in the used dataset being held by “Others” and “IN” (Independents). These seats are held respectively by smaller political groups that do not hold many seats individually and political candidates that do not affiliate themselves to any specific political group within the European Parliament.
+
+## Data Analysis
+
+The dataset has been manually compiled from a BBC article showing the European Parliament's election results from 2019 with the results broken down country by country. The article itself can be found in the link below:
+
+https://www.bbc.com/news/topics/c7zzdg3pmgpt/european-elections-2019#eu-parliament-scoreboard
+
+The data was compiled into a csv file containing how many seats each political group got by each country. The dataset shows values for both the election results of 2019 and 2014. 
+
+As mentioned before, all political groups in the 2014 election were present in the 2019 election, with the adition of the ENF political group.
+
+There is a total of 751 seats in the European Parliament and each member-State is allotted a number of seat proportional to its population. As a result, more populous countries have more seats in the European Parliament than less populous countries. For instance, Germany has a total of 96 seats in the European Parliament, while Luxembourg has only 6. It is also worth noting that the number of seats for each country has not changed from 2014 and 2019.
+
+The in its entirety can be seen below:
+
+```{r "loading dataset"}
+results.df <- elections_eu 
+results.df
+```
+
+The table above also had the values from the column "Year" changed from integer to factor.
+
+And below is a complete list of all political parties and countries contained in the dataset. The list with the name of parties and the countries in the dataset are stored in the vectors "parties" and "countries", respectively.
+
+```{r}
+parties <- names(results.df[,4:length(results.df)])
+parties
+countries <- unique(results.df$Country)
+countries
+```
+
+The data set itself can also be displayed with the results of each election individually. The table below shows the election results of the first 10 countries in the dataset exclusively for the year of 2019.
+
+```{r}
+results2019.df <- subset(results.df, Year == 2019, select = c("Country", "Total", "EPP", "S&D", "ALDE", "EFA", "ECR", "ENF", "EFD", "GUE", "IN", "Other"))
+
+head(results2019.df, 10)
+```
+
+And the same table for the 2014 results are shown below:
+
+```{r}
+
+results2014.df <- subset(results.df, Year == 2014, select = c("Country", "Total", "EPP", "S&D", "ALDE", "EFA", "ECR", "ENF", "EFD", "GUE", "IN", "Other"))
+
+head(results2014.df, 10)
+```
+
+Another useful dataframe for this analysis is a table that contains the difference of seats obtained by each party between the two elections. For instance, the dataframe "gainloss.df" shows that the EPP political group in Austria is assigned the value of "2", meaning that the EPP has gained two more European Parliament's seats in the 2019 election than it did in 2014. In the same way, S&D in Belgium is assigned the value of "-1", because that party has received one fewer seat in 2019 than it did in 2014 from Belgium. The first 10 lines of that table can be seen below.
+
+```{r}
+
+gainloss.df <- results2019.df - results2014.df
+gainloss.df[,1] <- countries
+countryseats <- results2019.df[,2]
+gainloss.df[,2] <- countryseats
+
+head(gainloss.df, 10)
+```
+## Creating Political Groups
+
+As mentioned in the introduction, many of the political parties within the European Union's Parliament have some similarities in their goals, values and political orientation. For instance, both the EPP and S&D are the oldest most traditional parties within the parliament, and while the former leans to the right and the latter to the left, both are centrist parties. At the same time, the ECR, ENF and EFD are all eurosceptic political parties.
+
+This means that by re-grouping the political parties within the EU Parliament that share certain similarities between themselves into bigger political groups presents an opportunity to re-evaluate the results of the 2014 and 2019 EU Parliament elections and better understand the shifts in seats in parliament.
+
+In order to do so, it is necessary to first define what the groups will be. And as previously mentioned, the EPP and S&D can be grouped together as a group of more traditional and centrist parties (henceforth called "traditional") one group and ECR, ENF and EFD as an eurosceptic political group (henceforth called "eurosceptic"). 
+
+The remaining parties in the database are ALDE, EFA and GUE, as well independent candidates and smaller parties (referenced as "Others" in the dataset). Although, ALDE, EFA and GUE represent a wide spectrum of political views ranging from liberal (ALDE), to leftist (GUE) and environmentalist (EFA), these three parties do share the fact that they are an alternative to the traditional political group while still retaining faith in the EU, therefore they could be grouped together as third political group (henceforth called "3rd Block", or simply as a "3rd" when referenced in the following code). 
+
+At the same time, the seats that are held by independents and other smaller parties (the ones marked in the dataset under "Independents" and "Others") can be grouped together as a fourth group of non-attached political parties (henceforth called "non_attacehd").
+
+The following chunk of code creates a list with vectors named after each of the four new political groups with the names of all parties pertaining to that group. The chunk of code also runs two of seven functions created for this analysis: the "newgroupby" function, which in turn internally runs the "newpoligroup" function. The "newpoligroup" sums the seats gained by each party member of a greater political group and the "newgroupby" function generates a dataframe with the results of the "newpoligroup" function for all political groups contained in the "groups" list. Additionally, a new column named "bias" is added with the name of the most voted political group within each country in each election. The result is a dataframe with the number of seats gained in both parliament elections for each country for each political group.
+
+
+```{r "Groups"}
+groups <- list(
+  "traditional" = c("EPP", "S&D"),
+  "eurosceptic" = c("ECR", "ENF", "EFD"),
+  "3rd" = c("ALDE", "EFA", "GUE"),
+  "non_attached" = c("IN", "Other")
+)
+poligroups.df <- newgroupby(results.df, groups)
+poligroups.df[, 'bias'] <- as.factor(
+  colnames(poligroups.df[,c("traditional","eurosceptic", "3rd", "non_attached")])
+  [apply(poligroups.df[,c("traditional","eurosceptic", "3rd", "non_attached")],1,which.max)]
+  )
+```
+
+The following chunks of code will create and display dataframes showing the results of the EU Parliament elections for each political group. Below is the results for the ten first entries in the dataframe for the 2014 election:
+
+```{r "2014 group"}
+poligroups2014.df <- poligroups.df[poligroups.df$Year=="2014",]
+poligroups2014.df$Year <- NULL
+head(poligroups2014.df, 10)
+```
+
+And below is the same dataframe, but with data for the 2019 election:
+
+```{r "2019 group"}
+poligroups2019.df <- poligroups.df[poligroups.df$Year=="2019",]
+poligroups2019.df$Year <- NULL
+head(poligroups2019.df, 10)
+```
+
+Now, what is still missing is this same data but shown as percentages of the available seats in each country. In other words, the following tables will show how much of the available seats each party and/or political group has gained in each country in each election. This is done by implementing the created function "percseats". The dataframe below, shows what percentage of the available seats in each country each party has gained.
+
+```{r "percentage seats"}
+
+percresults.df <- percseats(results.df, parties)
+
+head(percresults.df)
+
+```
+
+And now the following code is executed to get the same results but in tables exclusive to each year. Below the results for 2014 in percentages is obtained.
+
+```{r "2014 percresults"}
+percresults2014.df <- percresults.df[percresults.df$Year=="2014",]
+percresults2014.df$Year <- NULL
+
+```
+
+And below the same is done for 2019:
+
+```{r "2019 percresults"}
+percresults2019.df <- percresults.df[percresults.df$Year=="2019",]
+percresults2019.df$Year <- NULL
+
+```
+
+Now in order to obtain the same results but for the aggregated parties as done before in poligropus.df, the following code is executed:
+
+```{r "poligroups in percentages"}
+
+percpoligroups.df <- newgroupby(percresults.df, groups)
+
+percpoligroups2014.df <- percpoligroups.df[percpoligroups.df$Year=="2014",]
+percpoligroups2014.df$Year <- NULL
+
+percpoligroups2019.df <- percpoligroups.df[percpoligroups.df$Year=="2019",]
+percpoligroups2019.df$Year <- NULL
+
+head(percpoligroups.df)
+
+```
+
+
+## Changes Between 2014 and 2019
+
+The previously calculated "gainloss" table can also be expressed as percentage of available seats that have been gained (in positive values) or lost (in negative values) between the EU Parliament elections from 2014 to 2019. This is done by using the fourth function created for this analysis: the "percchange" function, which does a similar thing as the "percseats" function, but is a more rigid function that requires a dataframe that contains the total number of seats available in each country. The upside of the "percchange" function is that it works with the "gainloss.df" dataframe, since the sum of all values in any given line does not result in the total number of available seats in the EU parliament for the country represented by that line.
+
+```{r gainloss in percentages}
+
+gainlossperc.df <- percchange(gainloss.df, parties)
+
+gainlossperc.df
+
+```
+
+And now the same table but with the political parties reorganized into the larger political blocks used in this analysis.
+
+```{r Poligroups gainloss}
+
+gainlosspoliperc.df <- newgroupby(gainlossperc.df, groups, "Country")
+
+gainlosspoliperc.df
+
+```
+
+## Showing the Data with Maps
+
+Now that the necessary data has been prepared into the required dataframes, the next thing to do is to display that data intuitively on maps. The first such step is to create the object "world" with a world map and data on all countries using the "ne_countries" dataset loaded from the "rnaturalearth" and "rnaturalearthdata" r packages.
+
+Loading world data:
+
+```{r 'Load world data'}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+```
+
+The following chunk of code creates a new dataset by merging the data from "world" with the previously produced dataframes. The dataframes with the EU Parliament election results for the years 2014 and 2019, both in absolute number of seats and in percentage of available seats per country, will be added, as well as the dataframes with the absolute changes in seats gained in absolute numbers and in percentage of available seats. Only the dataframes using data for the larger political groups will be added, as they are the scope of this analysis. 
+
+Adding EU Political groups to world data:
+```{r 'Define temporary working world dataset with political groups'}
+t_group <- poligroups2014.df
+colnames(t_group) <- 
+  c(colnames(t_group)[1],
+    paste(colnames(t_group[,2:length(t_group)]), '2014',sep = "_"))
+t_world <- merge(world, t_group, by.x="name_long", by.y="Country")
+
+t_group <- percpoligroups2014.df
+colnames(t_group) <- 
+  c(colnames(t_group)[1],
+    paste(colnames(t_group[,2:length(t_group)]), '2014_perc',sep = "_"))
+t_world <- merge(t_world, t_group, by.x="name_long", by.y="Country")
+
+t_group <- poligroups2019.df
+colnames(t_group) <- 
+  c(colnames(t_group)[1],
+    paste(colnames(t_group[,2:length(t_group)]), '2019',sep = "_"))
+t_world <- merge(t_world, t_group, by.x="name_long", by.y="Country")
+
+t_group <- percpoligroups2019.df
+colnames(t_group) <- 
+  c(colnames(t_group)[1],
+    paste(colnames(t_group[,2:length(t_group)]), '2019_perc',sep = "_"))
+t_world <- merge(t_world, t_group, by.x="name_long", by.y="Country")
+
+t_group <- gainlosspoliperc.df
+colnames(t_group) <- 
+  c(colnames(t_group)[1],
+    paste(colnames(t_group[,2:length(t_group)]),"perc_gl",sep = "_"))
+t_world <- merge(t_world, t_group, by.x="name_long", by.y="Country")
+
+```
+
+
+#Major Political Groups in the 2014 and 2019 Elections
+
+Using the fifth function of this project (getmap2), a map of Europe will be produced showing what was the political group that held the most seats of EU Parliament in each country in that year's election. It is also worth pointing that in all maps in this project the epsg: 3035, as it is the recommended projection for the European Union, since it uses a equal area azimuthal projection centered in Europe, not distorting the sizes of any EU member-State in the map.
+
+The map below shows the **most elected political** group per country in the **2014** EU Parliament election:
+
+```{r 'Bias 2014', fig.width=6, fig.height=5, fig.align = "center"}
+get_map(t_world, t_world$bias_2014, title = "Major Political Group 2014")
+```
+
+As it can be seen in the map above, the predominant political group through most of Europe in 2014 was the Traditional group with almost every country in the EU electing it as the majority. Only Denmark, Estonia, Finland and the Netherlands had voted the 3rd block as their major political group. It was only in the United Kingdom where the largest elected political group was the Eurosceptics. The non-attached political group is not shown in this map (and the next) simply because it did not become the most voted political group in any country.
+
+
+The map below shows the **most elected political group** per country in the **2019** EU Parliament election:
+
+```{r 'Bias 2019', fig.width=6, fig.height=5, fig.align = "center"}
+get_map(t_world, t_world$bias_2019, title = "Major Political Group 2019")
+```
+
+The map above shows that the political landscape of the EU Parliament has changed significantly, but the Traditional political group still remains the most elected group in most countries. Meanwhile, both the Eurosceptic and 3rd Block have become the most elected group in more countries: the Eurosceptic gained Italy and Poland, while the 3rd Block took France, Ireland and the Czech Republic (although they no longer are the largest group in the Netherlands).
+
+
+# Traditionals
+
+The previous maps, although useful, cannot show with greater details the results of the elections. The maps below make use of the function "get_density_map" to produce a map that shows in a gradient how many seats each political group gained in each country. Therefore, it is possible to see how strong each political group was in each country, and not only what was the group with most seats. This analisys will be carried out for each of the four political groups, starting with the Traditionals.
+
+
+The map below shows the seats gained by the **Traditional** political group in the **2014** EU Parliament election:
+
+```{r 'Traditionals 2014', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$traditional_2014_perc, legend = "% of Seats", title = "Traditional 2014")
+```
+
+The map above shows that in most of Europe in 2014 the Traditional political group held a very high percentage of the votes in most countries and in some cases holding well above 50% of the seats. Few are the countries where the Traditionals hold less than 50% of the seats.
+
+The map below shows the seats gained by the **Traditional** political group in the **2019** EU Parliament election:
+
+```{r 'Traditionals 2019', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$traditional_2019_perc, legend = "% of Seats", title = "Traditional 2019")
+```
+
+The map above shows how much more "diluted" the results of the 2019 election has been for the Traditional political group. The map still is predominantly dark blue, showing that the Traditional group still is the most powerful political group within the EU Parliament, but their results have been inferior to the previously election. There are now much fewer countries where they have captured more than 50% of the seats and in some cases (France, UK and the Czech Republic) their results have been around or below 25% of the seats.
+
+The seventh and final function developed for this analysis (get_density_map2) produces a map with two gradients within the same scale. This is ideal for displaying the changes in seats of each political group between the 2014 and 2019 EU Parliament elections, since it is vital for this kind of map to clearly identify the differences between gains and losses of seats. The maps that use this function display what percentage of the available seats in each country has been gained or loss in the 2019 election in comparison to the 2014 election results. The white color in the gradient scale marks "zero" or, in other words, that no changes in the percent of available seats took place between the two elections.
+
+The map below will show the **changes** in the percentage of available seats held by the **Traditional** political group in each country between the 2014 and 2019 EU Parliament elections:
+
+```{r 'Traditionals gainloss', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map2(t_world, t_world$traditional_perc_gl, legend = "% of Seats", title = "Changes from 2014 to 2019 for Traditionals", gradmin = -32, gradmax = 42, gradnum = 4)
+```
+
+As the map above shows, the losses in seats held by the Traditional political group have taken place in most European countries and usually those losses have been big. France, Italy Czech Republic and Slovakia have shown the greatest losses for the Traditionals. There still have been a few countries where the Traditionals have made gains in 2019 in comparison with 2014, but these gains have been modest. And in the countries marked in white, the Traditionals kept the same amount of seats.
+
+# Euroscepticals
+
+Now the Eurosceptic political group's election results are observed. 
+
+The map below shows the seats held by the **Eurosceptic** political group in the **2014** EU Parliament election:
+
+```{r 'Eurospecticals 2014', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$eurosceptic_2014_perc, legend = "% of Seats", title = "Eurosceptics 2014")
+```
+
+As it can be seen, in 2014 the Eurosceptic political group was a weak force within the EU Parliament: in most countries they have no seats or well below 25% of the available seats. Their presence is strongest in only a few countries, and even there, their results are well below 50%: Italy, Lithuania, Latvia, Denmark and Poland. The rare exception is the UK, where the Eurosceptic political group actually holds more than 50% of the seats there (around 60%).
+
+
+The map below shows the seats held by the **Eurosceptic*** political group in the **2019** EU Parliament election:
+
+
+```{r 'Eurospecticals 2019', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$eurosceptic_2019_perc, legend = "% of Seats", title = "Eurosceptics 2019")
+```
+
+On the other hand, by the end of the 2019 election the map looks much more dark blue than before, in particular in Central Europe. There still are a number of countries where the Eurosceptic group holds no seats whatsoever, but in the vast majority of the continent, they hold seats. It is important however to keep things in perspective: with the exception of the UK, Italy and Poland (which in fairness are large countries and, therefore, hold a great number of seats within the EU Parliament), the Eurosceptic political group does not gather significantly more than 25% of the seats in any other country.
+
+The map below will show the **changes** in the percentage of available seats held by the **Eurosceptics** political group in each country between the 2014 and 2019 EU Parliament elections:
+
+```{r 'Eurospecticals gainloss', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map2(t_world, t_world$eurosceptic_perc_gl, legend = "% of Seats", title = "Changes from 2014 to 2019 for Eurosceptics", gradmin = -32, gradmax = 42, gradnum = 4)
+```
+
+The map above is predominantly blue in Central Europe, showing that the Eurosceptic political group has indeed gained a lot of votes in that part of the continent, but there are a few more interesting things that this map can point out. Italy is by far the country where Eurosceptics gained the most seats in 2019 in comparison to 2014: more than 40% more of the available seats than before. France also has shown a great increase around the 30 percentage points, but in the rest of the countries, where Eurosceptic participation has increased, the growth has been more moderate. In other words, with the exception of Italy and France, the increase in the seats held by Eurosceptic parties have been incremental, and not meteoric. 
+
+It is also interesting to point out that in other countries, the Eurosceptic political group has actually received fewer seats in 2019 than they did in 2014 and with the exception of Greece and Ireland, these were all countries where the Eurosceptic group held more than 25% of the seats in the 2014 election. The most interesting such example is the UK, that although still having the Eurosceptic group as its most prominent political group after the 2019 election, it has actually seen a decrease in the number of seats it held.
+
+
+# 3rd Block
+
+The map below shows the seats held by the **3rd Block** political group in the **2014** EU Parliament election:
+
+```{r '3rd 2014', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$`3rd_2014_perc`, legend = "% of Seats", title = "3rd Block 2014")
+```
+
+As it is revealed above, the 3rd Block is moderately well represented in 2014 throughout the EU, with the exception of Italy, Poland, Romania, Slovakia and Italy (places where this group has control of only a small fraction of the available seats). In most countries, the 3rd Block holds between 20 to just under 50% of seats, making it a significant, but far from overwhelming political force.
+
+The map below shows the seats held by the **3rd Block** political group in the **2019** EU Parliament election:
+
+```{r '3rd 2019', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$`3rd_2019_perc`, legend = "% of Seats", title = "3rd Block 2019")
+```
+
+By the end of the 2019 election, however, the map becomes much more dark blue than before. The 3rd Block's representation in Poland and Italy are still either zero or insignificant, but everywhere else, they are a fairly strong presence.
+
+The map below will show the **changes** in the percentage of available seats held by the **3rd Block** political group in each country between the 2014 and 2019 EU Parliament elections:
+
+```{r '3rd gainloss', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map2(t_world, t_world$`3rd_perc_gl`, legend = "% of Seats", title = "Changes from 2014 to 2019 for 3rd Block", gradmin = -32, gradmax = 42, gradnum = 4)
+```
+
+The changes in the participation in the EU Parliament for the 3rd Block between the 2014 and 2019 election has been a bit mixed: there have been losses, gains and even equal results spread all over the EU. However, where there were gains (particularly France, Britain, Denmark and Romania) the gains have been large, but the losses have been small (with the exception of Estonia and Croatia). As a net result, the 3rd block has increased its participation in the EU Parliament.
+
+# Non-Attached
+
+The map below shows the seats held by the **Non-Attached** political group in the **2014** EU Parliament election: 
+
+```{r 'Non attached 2014', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$non_attached_2014_perc, legend = "% of Seats", title = "Non-Attached 2014")
+```
+
+The Non-Attached political group is composed of smaller parties and independent candidates, so it is expected that it has a small number of seats in the EU Parliament and each country; and that is exactly what is seen in the map above. Only in France, Austria, Hungary, Greece and the Netherlands the Non_attached parties have a somewhat large number of available seats, with France (where the political group is that strongest) having around 30% of the seats awarded to this group.
+
+The map below shows the seats held by the **Non-Attached** political group in the **2019** EU Parliament election: 
+
+```{r 'Non attached 2019', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map(t_world, t_world$non_attached_2019_perc, legend = "% of Seats", title = "Non-Attached 2019")
+```
+
+After the 2019 election, the scenario is still very similar: the Non-Attached political group has a very small presence in the EU Parliament, even though there was quite a bit of change in the map, which is better discussed after visalizing the following map.
+
+The map below will show the **changes** in the percentage of available seats held by the **Non-Attached** political group in each country between the 2014 and 2019 EU Parliament elections:
+
+```{r 'Non attached gainloss', fig.width=6, fig.height=5, fig.align = "center"}
+get_density_map2(t_world, t_world$non_attached_perc_gl, legend = "% of Seats", title = "Changes from 2014 to 2019 for Non-Attached", gradmin = -32, gradmax = 42, gradnum = 4)
+```
+
+Although there is no changes for the Non-Attached political group in Portugal, UK, Scandinavia and in most of the Balkans. everywhere else there is change in all directions. France is the place where the political has had the most lost of seats (as a matter of fact, it is the largest loss of seats of any political group: 31% of available seats lost), with Austria also showing great losses. But there have also been countries with some gains, but hardly enough to compensate the losses in France.
+
+## Conclusion
+
+It can be seen in this analysis that the EU Parliament composition has gone through some significant changes between the 2014 and 2019 elections and by grouping the different European parties into larger political groups (even though those same parties do not see each other as aligned or even allies), the job of observing those changes become much easier. 
+
+Some of the main changes that can be seen is that the Traditional political group, although still the largest political group in the European Parliament, has lost seats throughout the whole continent, especially in France, Italy, Czech Republic and Slovakia. These losses have been picked up by the two other larger political groups: the Eurosceptics and the 3rd Block. Despite the growth in anti-European and nativist sentiment in the political discourse, the overall gains of the Eurosceptic parties has not been widespread and its hold in the EU seem to concentrate around France, Italy, Poland and the UK (This last one actually witnessing a reduction of seats held by Eurosceptics, while increasing in the other ones from 2014 to 2019). Meanwhile, the 3rd Block has also increased its number of seats held in parliament, but its overall rise in power has also been accompanied by a number lost of seats throughout the continent. Their net result was still positive, though, gaining much more seats in 2019 than in 2014 particularly in France, UK, Denmark and Romania.
+
+
+## References
+
+- https://www.bbc.com/news/topics/c7zzdg3pmgpt/european-elections-2019#eu-parliament-scoreboard
+
+- https://www.eppgroup.eu/about-us
+
+- https://www.socialistsanddemocrats.eu/who-we-are
+
+- https://www.aldeparty.eu/about/the-alde-party
+
+- https://efa.greens-efa.eu/en/our-group/presentation/
+
+- https://ecrgroup.eu/about
+
+- https://en.wikipedia.org/wiki/Europe_of_Nations_and_Freedom
+
+- https://en.wikipedia.org/wiki/Europe_of_Freedom_and_Democracy
+
+- https://www.guengl.eu/about-the-group/
