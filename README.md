@@ -29,9 +29,9 @@ Before running the commands in this guide, the following libraries are required:
 
 For installing those libraries, run the commands:
 ```r
-install.packages("ggplot2”)
-install.packages("rgeos”)
-install.packages("rnaturalearth”)
+install.packages("ggplot2")
+install.packages("rgeos")
+install.packages("rnaturalearth")
 install.packages("rnaturalearthdata")
 ```
 The package can be loaded by executing the following command:
@@ -116,6 +116,8 @@ t_world <- merge(world, df.data, by.x="name_long", by.y="Country")
 
 get_map(t_world, t_world$Bias, legend = "Sample Legend", title = "Major Parties")
 ```
+If the result does not display immediately, check if the map is present under the "Plots" window in RStudio.
+
 The "get_density_map" function creates a map with a gradient scale. Its projection also is centered on the European Union. The example below shows how to use get_density_map, even for a reduced dataset that covers only some of the countries within the EU.
 ```r
 library(euparliament)
@@ -134,6 +136,8 @@ t_world <- merge(world, df.data, by.x="name_long", by.y="Country")
 
 get_density_map(t_world, t_world$EPP, legend="Seats", title= "Seats Held by EPP", gradmax=50, gradnum =5)
 ```
+If the result does not display immediately, check if the map is present under the "Plots" window in RStudio.
+
 The "get_density_map2" is a very similar function to "get_density_map", but this one plots a similar map with two gradients in the same scale with a break set to the value zero. The example below shows how to use get_density_map2, even for a reduced dataset that covers only some of the countries within the EU.
 ```r
 library(euparliament)
@@ -152,6 +156,7 @@ t_world <- merge(world, df.data, by.x="name_long", by.y="Country")
 
 get_density_map2(t_world, t_world$SD, legend="Gains/Losses", title= "Seats Gained or Lost by SD")
 ```
+If the result does not display immediately, check if the map is present under the "Plots" window in RStudio.
 ## References:
 
 https://www.bbc.com/news/topics/c7zzdg3pmgpt/european-elections-2019#eu-parliament-scoreboard
