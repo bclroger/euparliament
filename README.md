@@ -133,11 +133,19 @@ get_density_map2(t_world, t_world$SD, legend="Gains/Losses", title= "Seats Gaine
 ## References:
 
 https://www.bbc.com/news/topics/c7zzdg3pmgpt/european-elections-2019#eu-parliament-scoreboard
+
 https://www.eppgroup.eu/about-us
+
 https://www.socialistsanddemocrats.eu/who-we-are
+
 https://www.aldeparty.eu/about/the-alde-party
+
 https://efa.greens-efa.eu/en/our-group/presentation/
+
 https://ecrgroup.eu/about
+
 https://en.wikipedia.org/wiki/Europe_of_Nations_and_Freedom
+
 https://en.wikipedia.org/wiki/Europe_of_Freedom_and_Democracy
+
 https://www.guengl.eu/about-the-group/
