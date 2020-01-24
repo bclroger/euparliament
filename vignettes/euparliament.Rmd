@@ -12,7 +12,7 @@ vignette: >
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-libs = c("ggplot2", "rnaturalearth", "rnaturalearthdata")
+libs = c("ggplot2", "rnaturalearth", "rnaturalearthdata", "rgeos")
 for (i in libs){
   if( !is.element(i, .packages(all.available = TRUE)) ) {
     install.packages(i)

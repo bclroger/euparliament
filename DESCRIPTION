@@ -11,7 +11,7 @@ Description: This package provides a database with the EU Parliament election re
 License: Free use
 Encoding: UTF-8
 LazyData: true
-Imports: ggplot2
+Imports: ggplot2, rgeos
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 URL: https://github.com/bclroger/euparliament
