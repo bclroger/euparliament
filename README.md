@@ -11,7 +11,7 @@ The other way is to click on the "package folder" in this GitHub page, then clic
 
 ## Package Overview:
 
-The package contains a set of seven functions, one dataset and one vignette with an analysis of the European Unions Parliament election results of 2014 and 2019. The analysis in the vignette presents how many seats of the EU Parliament have been awarded to each political party in each country and election, and then regroups parties with similar characteristics into larger political groups, making it easier to visualize and understand the changes in the balance of power between the two elections.
+The package contains a set of seven functions, one dataset and one vignette with an analysis of the European Union's Parliament election results of 2014 and 2019. The analysis in the vignette presents how many seats of the EU Parliament have been awarded to each political party in each country and election, and then regroups parties with similar characteristics into larger political groups, making it easier to visualize and understand the changes in the balance of power between the two elections.
 
 The dataset itself contains the number of seats awarded to each party in each country after each election and the functions listed in this Rpackage are all used in the vignette to transform the data as needed or to plot maps of the EU displaying the elections results and its changes.
 
@@ -29,7 +29,7 @@ The dataframe that contains the EU Parliament election results of 2014 and 2019,
 ```r
 elections_eu
 ```
-In order to visualize the vignette with the analysis of the election results for the EU Parliament,execute the following command:
+In order to visualize the vignette with the analysis of the election results for the EU Parliament, execute the following command:
 ```r
 browseVignettes("euparliament")
 ```
