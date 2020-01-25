@@ -2,7 +2,21 @@
 
 ## How to Install:
 
-In order to instsll the euparliament package, execute the following command in the command prompt of RStudio or of the console:
+The euparliament package is dependent on the following libraries:
+
+- ggplot2
+- rgeos
+- rnaturalearth
+- rnaturalearthdata
+
+Due to the dependencies with those libraries, it is required that those libraries are already installed. For installing those libraries, run the commands:
+```r
+install.packages("ggplot2")
+install.packages("rgeos")
+install.packages("rnaturalearth")
+install.packages("rnaturalearthdata")
+```
+In order to install the euparliament package itself, execute the following command in the command prompt of RStudio or of the console:
 
 ```r
 install.packages("https://github.com/bclroger/euparliament/raw/master/package/euparliament_1.0.0.tar.gz", repos=NULL, type="source")
